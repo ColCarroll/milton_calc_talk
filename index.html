@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Linear Regression -- An Introduction</title>
+
+    <meta name="description" content="Introduction to Linear Regression">
+    <meta name="author" content="Colin Carroll">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/night.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="css/zenburn.css">
+
+    <!-- My style -->
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/paper.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section>
+            <h1>Linear Regression</h1>
+            <h3>An introduction</h3>
+            <p><small>Colin Carroll</small></p>
+        </section>
+
+        <section>
+            <h2>Background</h2>
+            <img src="img/williams.jpg">
+            <img src="img/rice.jpg">
+        </section>
+
+        <section>
+            <h2>Background</h2>
+            <img src="img/spiceworks.gif">
+        </section>
+
+        <section>
+            <h2>Motivation</h2>
+
+            <p>Detect underlying patterns in data</p>
+            <ul>
+
+                <li>
+                    What relationship (if any) exists between variables?
+                </li>
+
+                <li>
+                    What will happen in a novel situation?
+                </li>
+
+                <li>
+                    How can we change outcomes?
+                </li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>What relationship (if any) exists between variables?</h2>
+                <pre><code>
+                    height      distance
+                    1000        573
+                    800         534
+                    600         495
+                    450         451
+                    300         395
+                    200         337
+                    100         253
+                </code></pre>
+        </section>
+
+        <section>
+            <h2>What relationship (if any) exists between variables?</h2>
+            <div id="galileoPlot"></div>
+        </section>
+
+        <section>
+            <h2>What relationship (if any) exists between variables?</h2>
+            <div id="faithfulPlot"></div>
+        </section>
+
+        <section>
+            <h2>Predicting a Novel Situation</h2>
+            <div id="weatherPlot"></div>
+        </section>
+
+        <section>
+            <h2>Changing Outcomes</h2>
+            <div id="carPlot"></div>
+        </section>
+
+        <section>
+            <h2>Goal</h2>
+            <p>
+                Given some points $$\{(x_1, y_1), (x_2, y_2), \ldots, (x_n, y_n)\},$$ find some
+                function $$f(x)$$ that is "close" to the observed data.
+            </p>
+        </section>
+
+        <section>
+            <h2>Goal</h2>
+            <p>
+                Minimize the <em>error function</em>
+                $$
+                error(f) = \sum_{j = 1}^n (f(x_j) - y_j)^2.
+                $$
+            </p>
+        </section>
+
+        <section>
+            <h2>First Approach</h2>
+            <p>
+                If \(f(x) = m x,\) for some number \(m\), then the error is a function of just one variable:
+                $$
+                error(m) = \sum_{j = 1}^n (m x_j - y_j)^2.
+                $$
+            </p>
+        </section>
+
+        <section>
+            <h2>Exercise</h2>
+            $$
+            error(m) = \sum_{j = 1}^n (m x_j - y_j)^2.
+            $$
+            <ul>
+                <li>What is $$\frac{d}{dm}error?$$</li>
+                <li>What value of \(m\) minimizes the error?</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Application</h2>
+            <label for="coinSlope">Line Slope</label>
+            <input id="coinSlope" type="range"  min="0" max="1" step="0.01">
+            <p>
+                y = <span id="coinSlopeLabel"></span>x
+            </p>
+            <p>
+                Error: <span id="coinSlopeError"></span>
+            </p>
+            <div id="coinPlot"></div>
+        </section>
+
+        <section>
+            <h2>Application</h2>
+            <label for="galileoSlope">Line Slope</label>
+            <input id="galileoSlope" type="range"  min="0" max="100" step=".1">
+            <p>
+                y = <span id="galileoSlopeLabel"></span>x<sup>1/3</sup>
+            </p>
+            <p>
+                Error: <span id="galileoSlopeError"></span>
+            </p>
+            <div id="galileoLine"></div>
+        </section>
+
+
+    </div>
+
+</div>
+
+<script src="js/head.min.js"></script>
+<script src="js/reveal.js"></script>
+<script type="text/javascript" src="/MathJax/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+
+    // Full list of configuration options available at:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+        // Optional reveal.js plugins
+        dependencies: [
+            { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'js/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+            { src: 'js/zoom.js', async: true },
+            { src: 'js/notes.js', async: true }
+        ]
+    });
+
+</script>
+<script src="js/d3.js"></script>
+<script src="js/plotPoints.js"></script>
+<script>
+    plotPoints('#galileoPlot', [
+        {y: 573, x: 1000},
+        {y: 534, x: 800},
+        {y: 495, x: 600},
+        {y: 451, x: 450},
+        {y: 395, x: 300},
+        {y: 337, x: 200},
+        {y: 253, x: 100}
+    ], {ylims: [0, 610], xlims: [-10, 1050]});
+</script>
+
+<script>
+    plotPoints('#faithfulPlot',[
+        {"y":3.6,"x":79},
+        {"y":1.8,"x":54},
+        {"y":3.333,"x":74},
+        {"y":2.283,"x":62},
+        {"y":4.533,"x":85},
+        {"y":2.883,"x":55},
+        {"y":4.7,"x":88},
+        {"y":3.6,"x":85},
+        {"y":1.95,"x":51},
+        {"y":4.35,"x":85},
+        {"y":1.833,"x":54},
+        {"y":3.917,"x":84},
+        {"y":4.2,"x":78},
+        {"y":1.75,"x":47},
+        {"y":4.7,"x":83},
+        {"y":2.167,"x":52},
+        {"y":1.75,"x":62},
+        {"y":4.8,"x":84},
+        {"y":1.6,"x":52},
+        {"y":4.25,"x":79},
+        {"y":1.8,"x":51},
+        {"y":1.75,"x":47},
+        {"y":3.45,"x":78},
+        {"y":3.067,"x":69},
+        {"y":4.533,"x":74},
+        {"y":3.6,"x":83},
+        {"y":1.967,"x":55},
+        {"y":4.083,"x":76},
+        {"y":3.85,"x":78},
+        {"y":4.433,"x":79},
+        {"y":4.3,"x":73},
+        {"y":4.467,"x":77},
+        {"y":3.367,"x":66},
+        {"y":4.033,"x":80},
+        {"y":3.833,"x":74},
+        {"y":2.017,"x":52},
+        {"y":1.867,"x":48},
+        {"y":4.833,"x":80},
+        {"y":1.833,"x":59},
+        {"y":4.783,"x":90},
+        {"y":4.35,"x":80},
+        {"y":1.883,"x":58},
+        {"y":4.567,"x":84},
+        {"y":1.75,"x":58},
+        {"y":4.533,"x":73},
+        {"y":3.317,"x":83},
+        {"y":3.833,"x":64},
+        {"y":2.1,"x":53},
+        {"y":4.633,"x":82},
+        {"y":2,"x":59},
+        {"y":4.8,"x":75},
+        {"y":4.716,"x":90},
+        {"y":1.833,"x":54},
+        {"y":4.833,"x":80},
+        {"y":1.733,"x":54},
+        {"y":4.883,"x":83},
+        {"y":3.717,"x":71},
+        {"y":1.667,"x":64},
+        {"y":4.567,"x":77},
+        {"y":4.317,"x":81},
+        {"y":2.233,"x":59},
+        {"y":4.5,"x":84},
+        {"y":1.75,"x":48},
+        {"y":4.8,"x":82},
+        {"y":1.817,"x":60},
+        {"y":4.4,"x":92},
+        {"y":4.167,"x":78},
+        {"y":4.7,"x":78},
+        {"y":2.067,"x":65},
+        {"y":4.7,"x":73},
+        {"y":4.033,"x":82},
+        {"y":1.967,"x":56},
+        {"y":4.5,"x":79},
+        {"y":4,"x":71},
+        {"y":1.983,"x":62},
+        {"y":5.067,"x":76},
+        {"y":2.017,"x":60},
+        {"y":4.567,"x":78},
+        {"y":3.883,"x":76},
+        {"y":3.6,"x":83},
+        {"y":4.133,"x":75},
+        {"y":4.333,"x":82},
+        {"y":4.1,"x":70},
+        {"y":2.633,"x":65},
+        {"y":4.067,"x":73},
+        {"y":4.933,"x":88},
+        {"y":3.95,"x":76},
+        {"y":4.517,"x":80},
+        {"y":2.167,"x":48},
+        {"y":4,"x":86},
+        {"y":2.2,"x":60},
+        {"y":4.333,"x":90},
+        {"y":1.867,"x":50},
+        {"y":4.817,"x":78},
+        {"y":1.833,"x":63},
+        {"y":4.3,"x":72},
+        {"y":4.667,"x":84},
+        {"y":3.75,"x":75},
+        {"y":1.867,"x":51},
+        {"y":4.9,"x":82},
+        {"y":2.483,"x":62},
+        {"y":4.367,"x":88},
+        {"y":2.1,"x":49},
+        {"y":4.5,"x":83},
+        {"y":4.05,"x":81},
+        {"y":1.867,"x":47},
+        {"y":4.7,"x":84},
+        {"y":1.783,"x":52},
+        {"y":4.85,"x":86},
+        {"y":3.683,"x":81},
+        {"y":4.733,"x":75},
+        {"y":2.3,"x":59},
+        {"y":4.9,"x":89},
+        {"y":4.417,"x":79},
+        {"y":1.7,"x":59},
+        {"y":4.633,"x":81},
+        {"y":2.317,"x":50},
+        {"y":4.6,"x":85},
+        {"y":1.817,"x":59},
+        {"y":4.417,"x":87},
+        {"y":2.617,"x":53},
+        {"y":4.067,"x":69},
+        {"y":4.25,"x":77},
+        {"y":1.967,"x":56},
+        {"y":4.6,"x":88},
+        {"y":3.767,"x":81},
+        {"y":1.917,"x":45},
+        {"y":4.5,"x":82},
+        {"y":2.267,"x":55},
+        {"y":4.65,"x":90},
+        {"y":1.867,"x":45},
+        {"y":4.167,"x":83},
+        {"y":2.8,"x":56},
+        {"y":4.333,"x":89},
+        {"y":1.833,"x":46},
+        {"y":4.383,"x":82},
+        {"y":1.883,"x":51},
+        {"y":4.933,"x":86},
+        {"y":2.033,"x":53},
+        {"y":3.733,"x":79},
+        {"y":4.233,"x":81},
+        {"y":2.233,"x":60},
+        {"y":4.533,"x":82},
+        {"y":4.817,"x":77},
+        {"y":4.333,"x":76},
+        {"y":1.983,"x":59},
+        {"y":4.633,"x":80},
+        {"y":2.017,"x":49},
+        {"y":5.1,"x":96},
+        {"y":1.8,"x":53},
+        {"y":5.033,"x":77},
+        {"y":4,"x":77},
+        {"y":2.4,"x":65},
+        {"y":4.6,"x":81},
+        {"y":3.567,"x":71},
+        {"y":4,"x":70},
+        {"y":4.5,"x":81},
+        {"y":4.083,"x":93},
+        {"y":1.8,"x":53},
+        {"y":3.967,"x":89},
+        {"y":2.2,"x":45},
+        {"y":4.15,"x":86},
+        {"y":2,"x":58},
+        {"y":3.833,"x":78},
+        {"y":3.5,"x":66},
+        {"y":4.583,"x":76},
+        {"y":2.367,"x":63},
+        {"y":5,"x":88},
+        {"y":1.933,"x":52},
+        {"y":4.617,"x":93},
+        {"y":1.917,"x":49},
+        {"y":2.083,"x":57},
+        {"y":4.583,"x":77},
+        {"y":3.333,"x":68},
+        {"y":4.167,"x":81},
+        {"y":4.333,"x":81},
+        {"y":4.5,"x":73},
+        {"y":2.417,"x":50},
+        {"y":4,"x":85},
+        {"y":4.167,"x":74},
+        {"y":1.883,"x":55},
+        {"y":4.583,"x":77},
+        {"y":4.25,"x":83},
+        {"y":3.767,"x":83},
+        {"y":2.033,"x":51},
+        {"y":4.433,"x":78},
+        {"y":4.083,"x":84},
+        {"y":1.833,"x":46},
+        {"y":4.417,"x":83},
+        {"y":2.183,"x":55},
+        {"y":4.8,"x":81},
+        {"y":1.833,"x":57},
+        {"y":4.8,"x":76},
+        {"y":4.1,"x":84},
+        {"y":3.966,"x":77},
+        {"y":4.233,"x":81},
+        {"y":3.5,"x":87},
+        {"y":4.366,"x":77},
+        {"y":2.25,"x":51},
+        {"y":4.667,"x":78},
+        {"y":2.1,"x":60},
+        {"y":4.35,"x":82},
+        {"y":4.133,"x":91},
+        {"y":1.867,"x":53},
+        {"y":4.6,"x":78},
+        {"y":1.783,"x":46},
+        {"y":4.367,"x":77},
+        {"y":3.85,"x":84},
+        {"y":1.933,"x":49},
+        {"y":4.5,"x":83},
+        {"y":2.383,"x":71},
+        {"y":4.7,"x":80},
+        {"y":1.867,"x":49},
+        {"y":3.833,"x":75},
+        {"y":3.417,"x":64},
+        {"y":4.233,"x":76},
+        {"y":2.4,"x":53},
+        {"y":4.8,"x":94},
+        {"y":2,"x":55},
+        {"y":4.15,"x":76},
+        {"y":1.867,"x":50},
+        {"y":4.267,"x":82},
+        {"y":1.75,"x":54},
+        {"y":4.483,"x":75},
+        {"y":4,"x":78},
+        {"y":4.117,"x":79},
+        {"y":4.083,"x":78},
+        {"y":4.267,"x":78},
+        {"y":3.917,"x":70},
+        {"y":4.55,"x":79},
+        {"y":4.083,"x":70},
+        {"y":2.417,"x":54},
+        {"y":4.183,"x":86},
+        {"y":2.217,"x":50},
+        {"y":4.45,"x":90},
+        {"y":1.883,"x":54},
+        {"y":1.85,"x":54},
+        {"y":4.283,"x":77},
+        {"y":3.95,"x":79},
+        {"y":2.333,"x":64},
+        {"y":4.15,"x":75},
+        {"y":2.35,"x":47},
+        {"y":4.933,"x":86},
+        {"y":2.9,"x":63},
+        {"y":4.583,"x":85},
+        {"y":3.833,"x":82},
+        {"y":2.083,"x":57},
+        {"y":4.367,"x":82},
+        {"y":2.133,"x":67},
+        {"y":4.35,"x":74},
+        {"y":2.2,"x":54},
+        {"y":4.45,"x":83},
+        {"y":3.567,"x":73},
+        {"y":4.5,"x":73},
+        {"y":4.15,"x":88},
+        {"y":3.817,"x":80},
+        {"y":3.917,"x":71},
+        {"y":4.45,"x":83},
+        {"y":2,"x":56},
+        {"y":4.283,"x":79},
+        {"y":4.767,"x":78},
+        {"y":4.533,"x":84},
+        {"y":1.85,"x":58},
+        {"y":4.25,"x":83},
+        {"y":1.983,"x":43},
+        {"y":2.25,"x":60},
+        {"y":4.75,"x":75},
+        {"y":4.117,"x":81},
+        {"y":2.15,"x":46},
+        {"y":4.417,"x":90},
+        {"y":1.817,"x":46},
+        {"y":4.467,"x":74}], {xlims: [39, 100], ylims: [0, 6.1]});
+</script>
+
+<script>
+    plotPoints('#weatherPlot', [
+        {x: 1, y: 18},
+        {x: 2, y: 18},
+        {x: 3, y: 10},
+        {x: 4, y: 26},
+        {x: 5, y: 20},
+        {x: 6, y: 8},
+        {x: 7, y: 18},
+        {x: 8, y: 20},
+        {x: 9, y: 16},
+        {x: 10, y: 20},
+        {x: 11, y: 20},
+        {x: 12, y: 22},
+        {x: 13, y: 10},
+        {x: 14, y: 14},
+        {x: 15, y: 8},
+        {x: 16, y: 4},
+        {x: 17, y: 13},
+        {x: 18, y: 21},
+        {x: 19, y: 16}
+    ], {xlims: [0.2, 28], ylims: [0, 32]});
+</script>
+
+<script>
+    plotPoints('#carPlot', [
+        {"x":4,"y":2},
+        {"x":4,"y":10},
+        {"x":7,"y":4},
+        {"x":7,"y":22},
+        {"x":8,"y":16},
+        {"x":9,"y":10},
+        {"x":10,"y":18},
+        {"x":10,"y":26},
+        {"x":10,"y":34},
+        {"x":11,"y":17},
+        {"x":11,"y":28},
+        {"x":12,"y":14},
+        {"x":12,"y":20},
+        {"x":12,"y":24},
+        {"x":12,"y":28},
+        {"x":13,"y":26},
+        {"x":13,"y":34},
+        {"x":13,"y":34},
+        {"x":13,"y":46},
+        {"x":14,"y":26},
+        {"x":14,"y":36},
+        {"x":14,"y":60},
+        {"x":14,"y":80},
+        {"x":15,"y":20},
+        {"x":15,"y":26},
+        {"x":15,"y":54},
+        {"x":16,"y":32},
+        {"x":16,"y":40},
+        {"x":17,"y":32},
+        {"x":17,"y":40},
+        {"x":17,"y":50},
+        {"x":18,"y":42},
+        {"x":18,"y":56},
+        {"x":18,"y":76},
+        {"x":18,"y":84},
+        {"x":19,"y":36},
+        {"x":19,"y":46},
+        {"x":19,"y":68},
+        {"x":20,"y":32},
+        {"x":20,"y":48},
+        {"x":20,"y":52},
+        {"x":20,"y":56},
+        {"x":20,"y":64},
+        {"x":22,"y":66},
+        {"x":23,"y":54},
+        {"x":24,"y":70},
+        {"x":24,"y":92},
+        {"x":24,"y":93},
+        {"x":24,"y":120},
+        {"x":25,"y":85}], {xlims: [-1, 30], ylims: [0, 125]});
+</script>
+
+
+<script>
+    plotPointLine('#coinPlot', [
+        {'y': 0, 'x': 1},
+        {'y': 1, 'x': 2},
+        {'y': 1, 'x': 3},
+        {'y': 1, 'x': 4},
+        {'y': 2, 'x': 5},
+        {'y': 2, 'x': 6},
+        {'y': 2, 'x': 7},
+        {'y': 6, 'x': 8},
+        {'y': 4, 'x': 9},
+        {'y': 3, 'x': 10},
+        {'y': 4, 'x': 11},
+        {'y': 5, 'x': 12},
+        {'y': 9, 'x': 13},
+        {'y': 8, 'x': 14},
+        {'y': 3, 'x': 15},
+        {'y': 10, 'x': 16},
+        {'y': 5, 'x': 17},
+        {'y': 16, 'x': 18},
+        {'y': 10, 'x': 19},
+        {'y': 10, 'x': 20},
+        {'y': 9, 'x': 21},
+        {'y': 8, 'x': 22},
+        {'y': 12, 'x': 23},
+        {'y': 12, 'x': 24},
+        {'y': 13, 'x': 25},
+        {'y': 11, 'x': 26},
+        {'y': 11, 'x': 27},
+        {'y': 18, 'x': 28},
+        {'y': 13, 'x': 29},
+        {'y': 20, 'x': 30}
+    ], {xlims: [0, 31], ylims: [0, 31]}, function(j){return j;},
+            "#coinSlope",
+            "#coinSlopeLabel",
+            "#coinSlopeError",
+            0.5);
+</script>
+
+<script>
+    plotPointLine('#galileoLine', [
+        {y: 573, x: 1000},
+        {y: 534, x: 800},
+        {y: 495, x: 600},
+        {y: 451, x: 450},
+        {y: 395, x: 300},
+        {y: 337, x: 200},
+        {y: 253, x: 100}
+    ], {ylims: [0, 610], xlims: [1, 1050]}, function(j){return Math.pow(j, 1 / 3);},
+            "#galileoSlope",
+            "#galileoSlopeLabel",
+            "#galileoSlopeError",
+            50);
+</script>
+
+</body>
+</html>
